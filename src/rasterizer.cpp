@@ -63,15 +63,30 @@ namespace CGL {
       rasterize_point(pt[0], pt[1], color);
       pt[0] += dpt[0]; pt[1] += dpt[1];
     }
-  }
+  } 
 
   // Rasterize a triangle.
   void RasterizerImp::rasterize_triangle(float x0, float y0,
     float x1, float y1,
     float x2, float y2,
     Color color) {
-    // TODO: Task 1: Implement basic triangle rasterization here, no supersampling
+    // TODO: Task 1: Implement basic triangle rasterization here, no supersampling   
 
+    int xmin = ceil(min(min(x0, x1), x2));
+    int xmax = ceil(max(max(x0, x1), x2));
+    int ymin = ceil(min(min(y0, y1), y2));
+    int ymax = ceil(max(max(y0, y1), y2));
+
+    for (int i=xmin; i<xmax; i++) {
+      for (int j=ymin; j<ymax; j++) {
+        float l0 = -(i - x0)*(y1-y0) + (j - y0)*(x1-x0);
+        float l1 = -(i - x1)*(y2-y1) + (j - y1)*(x2-x1);
+        float l2 = -(i - x2)*(y0-y2) + (j - y2)*(x0-x2);
+        if (l0 >= 0 && l1 >= 0 && l2 >= 0) {
+          fill_pixel(i, j, color);
+        }
+      }
+    }
     // TODO: Task 2: Update to implement super-sampled rasterization
 
 
