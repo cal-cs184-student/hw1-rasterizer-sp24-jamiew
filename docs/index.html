@@ -3,94 +3,168 @@
 <head>
 <style>
   body {
-    padding: 100px;
-    width: 1000px;
-    margin: auto;
+    position: relative;
+    padding: 0;
+    margin: 0;
+  }
+  header {
+    position: relative;
+    background-color: #379f31;
+    padding: 50px 100px;
+    margin: 0;
+  }
+  .main {
+    padding: 0 100px;
     text-align: left;
     font-weight: 300;
     font-family: 'Open Sans', sans-serif;
     color: #121212;
   }
-  h1, h2, h3, h4 {
-    font-family: 'Source Sans Pro', sans-serif;
+  h1 {
+    color: #FFF;
+    font-family: 'Playfair Display', serif;
+    font-size: 35px;
+    font-weight: 600;
+    margin: 0 auto;
+  }
+  h2 {
+    color: #FFF;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    font-size: 10 !important;
+    letter-spacing: 0.1em;
+    margin: 0 auto;
+  }
+  h3 {
+    color: #121212;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    margin: 0 auto;
+  }
+  h4 {
+    color: #379f31;
+    font-weight: 600;
+    font-size: 20px;
+    font-family: 'Open Sans', sans-serif;
+  }
+  .homework-num {
+    color:#379f31;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin: 80px 0 0 0;
+  }
+  .overview {
+    color: #121212;
+    margin: 0;
+  }
+  .overview-container {
+    background-color:#379f315b;
+    padding: 50px;
+    margin: 50px 0 0 0;
+  }
+  .section {
+    font-size: 25px;
+  }
+  .entry {
+    margin: 0 0 0 22px;
+  }
+  .image {
+    margin: 30px 0;
+  }
+  .caption {
+    font-style: italic;
+    font-size: 14px;
+  }
+  footer {
+    height: 20vh;
   }
 </style>
 <title>CS 184/284A Rasterizer</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,500&display=swap" rel="stylesheet">
 </head>
 
-
 <body>
+  <header>
+    <h2>CS 184/284A</h2>
+    <h1>Computer Graphics and Imaging, Spring 2024</h1>
+  </header>
+  <div class="main">
+    <p align="middle" class="homework-num">Homework 1</p>
+    <h3 align="middle">Rasterizer</h1>
+    <p align="middle">Jamie Walton</p>
 
-<h1 align="middle">CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
-<h1 align="middle">Homework 1: Rasterizer</h1>
-<h2 align="middle">YOUR NAME</h2>
+    <div class="overview-container">
+      <p class="homework-num overview">Overview</p>
+      <p>
+        Give a high-level overview of what you implemented in this homework 
+        Think about what you've built as a whole. Share your thoughts on what 
+        interesting things you've learned from completing the homework.
+      </p>
+    </div>
 
-<br><br>
+    <div>
+      <p class="homework-num">Section 1</p>
+      <h3 class="section">Rasterization</h3>
 
-<div>
+      <h4>1. Rasterizing single-color triangles</h4>
+      <p class="entry">
+        First, the algorithm determines how much of x- and y-space the triangle
+        covers to ensure that it does not test any extraneous pixels. It then loops
+        through every integer coordinate combination within this space and checks
+        whether the triangle contains the position. To do this, it calculates the
+        point's distance to each line defining the edge of the triangle-- if the
+        point has a zero or positive distance from every line, it is within the 
+        triangle. In that case, the corresponding pixel is filled in with the
+        specified color. Otherwise, the loop continues.
+        <br/>
+        This algorithm specifically checks every pixel within the bounding box,
+        meaning that it has a comparable efficiency and memory cost as other 
+        bounding box algorithms. 
+        <br/>
+        <img src="./images/task1.png" alt="Screenshot of rendered triangles, with the
+        pixel inspector highlighting an aliased region." width="500px" class="image"/>
+        <p class="caption">
+          Fig 1. Rendered triangles with the pixel inspector highlighting an aliased region.
+        </p>
+      </p>
 
-<h2 align="middle">Overview</h2>
-<p>Give a high-level overview of what you implemented in this homework Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.</p>
+      <h4>2. Antialiasing triangles</h4>
+      <p></p>
 
-<h2 align="middle">Section I: Rasterization</h2>
+      <h4>3. Transforms</h4>
+      <p></p>
+    </div>
 
-<h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+    <div>
+      <p class="homework-num">Section 2</p>
+      <h3 class="section">Sampling</h3>
 
-<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+      <h4>4. Barycentric coordinates</h4>
+      <p></p>
 
-<div align="middle">
-  <table style="width=100%">
-    <tr>
-      <td>
-        <img src="images/image1.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
-      </td>
-      <td>
-        <img src="images/image2.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
-      </td>
-    </tr>
-    <br>
-    <tr>
-      <td>
-        <img src="images/image3.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
-      </td>
-      <td>
-        <img src="images/image4.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
-      </td>
-    </tr>
-  </table>
-</div>
+      <h4>5. "Pixel sampling" for texture mapping</h4>
+      <p></p>
 
+      <h4>6. Part 6: "Level sampling" with mipmaps for texture mapping</h4>
+      <p></p>
+    </div>
 
-<h3 align="middle">Part 2: Antialiasing triangles</h3>
+    <div>
+      <p class="homework-num">Section 3</p>
+      <h3 class="section">Art Competition</h3>
+      
+      <h4>6. Part 6: "Level sampling" with mipmaps for texture mapping</h4>
+      <p></p>
+    </div>
 
+    <footer></footer>
 
-
-<h3 align="middle">Part 3: Transforms</h3>
-
-
-
-<h2 align="middle">Section II: Sampling</h2>
-
-<h3 align="middle">Part 4: Barycentric coordinates</h3>
-
-
-<h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
-
-
-<h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
-
-
-
-<h2 align="middle">Section III: Art Competition</h2>
-<p>If you are not participating in the optional art competition, don't worry about this section!</p>
-
-<h3 align="middle">Part 7: Draw something interesting!</h3>
-
+  </div>
 </body>
 </html>
