@@ -34,7 +34,7 @@ DrawRend::~DrawRend(void) {
 void DrawRend::init() {
   gl = true;
 
-  sample_rate = 400;
+  sample_rate = 4;
   left_clicked = false;
   show_zoom = 0;
 
