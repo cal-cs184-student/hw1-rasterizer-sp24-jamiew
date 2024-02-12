@@ -117,9 +117,27 @@ namespace CGL {
     float x1, float y1, Color c1,
     float x2, float y2, Color c2)
   {
-    // TODO: Task 4: Rasterize the triangle, calculating barycentric coordinates and using them to interpolate vertex colors across the triangle
-    // Hint: You can reuse code from rasterize_triangle
+    int xmin = ceil(min(min(x0, x1), x2));
+    int xmax = ceil(max(max(x0, x1), x2));
+    int ymin = ceil(min(min(y0, y1), y2));
+    int ymax = ceil(max(max(y0, y1), y2));
 
+    float L0 = -(x0-x1)*(y2-y1) + (y0-y1)*(x2-x1);
+    float L1 = -(x1-x2)*(y0-y2) + (y1-y2)*(x0-x2);
+    float L2 = -(x2-x0)*(y1-y0) + (y2-y0)*(x1-x0);
+
+    for (int x = xmin; x < xmax; x++) {
+      for (int y = ymin; y < ymax; y++) {
+        float L01 = -(x-x0)*(y1-y0) + (y-y0)*(x1-x0);
+        float L12 = -(x-x1)*(y2-y1) + (y-y1)*(x2-x1);
+        float L20 = -(x-x2)*(y0-y2) + (y-y2)*(x0-x2);
+        float a = L12 / L0;
+        float b = L20 / L1;
+        float c = L12 / L2;
+        Color color = (a*c0) + (b*c1) + (c*c2);
+        fill_pixel(x, y, color);
+      }
+    }
 
 
   }
