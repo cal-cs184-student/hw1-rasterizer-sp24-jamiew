@@ -99,9 +99,9 @@ namespace CGL {
     x0 = coords[0][0]; x1 = coords[1][0]; x2 = coords[2][0];
     y0 = coords[0][1]; y1 = coords[1][1]; y2 = coords[2][1];
 
-    int xmin = ceil(min(min(x0, x1), x2));
+    int xmin = floor(min(min(x0, x1), x2));
     int xmax = ceil(max(max(x0, x1), x2));
-    int ymin = ceil(min(min(y0, y1), y2));
+    int ymin = floor(min(min(y0, y1), y2));
     int ymax = ceil(max(max(y0, y1), y2));
 
     int dim = ceil(sqrt(sample_rate));
@@ -145,9 +145,9 @@ namespace CGL {
     x0 = coords[0][0]; x1 = coords[1][0]; x2 = coords[2][0];
     y0 = coords[0][1]; y1 = coords[1][1]; y2 = coords[2][1];
 
-    int xmin = ceil(min(min(x0, x1), x2));
+    int xmin = floor(min(min(x0, x1), x2));
     int xmax = ceil(max(max(x0, x1), x2));
-    int ymin = ceil(min(min(y0, y1), y2));
+    int ymin = floor(min(min(y0, y1), y2));
     int ymax = ceil(max(max(y0, y1), y2));
 
     double L0 = -(x0-x1)*(y2-y1) + (y0-y1)*(x2-x1);
