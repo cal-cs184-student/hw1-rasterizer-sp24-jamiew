@@ -1,4 +1,5 @@
 #include "rasterizer.h"
+#include <cmath>
 #include "vector2D.h"
 
 using namespace std;
@@ -103,13 +104,32 @@ namespace CGL {
     int ymin = ceil(min(min(y0, y1), y2));
     int ymax = ceil(max(max(y0, y1), y2));
 
-    for (int i=xmin; i<xmax; i++) {
-      for (int j=ymin; j<ymax; j++) {
-        float l0 = -(i - x0)*(y1-y0) + (j - y0)*(x1-x0);
-        float l1 = -(i - x1)*(y2-y1) + (j - y1)*(x2-x1);
-        float l2 = -(i - x2)*(y0-y2) + (j - y2)*(x0-x2);
-        if (l0 >= 0 && l1 >= 0 && l2 >= 0) {
-          fill_pixel(i, j, color);
+    int dim = ceil(sqrt(sample_rate));
+    double step = 1.0 / dim;
+
+    for (double x=xmin; x<xmax; x++) {
+      for (double y=ymin; y<ymax; y++) {
+        
+        double scale = 0;
+        double i_min = x + (0.5*step);
+        double j_min = y + (0.5*step);
+        double iters = 0;
+
+        for (double i=i_min; i<i_min+1-(0.5*step); i=i+step) {
+          for (double j=j_min; j<j_min+1-(0.5*step); j=j+step) {
+            double l0 = -(i - x0)*(y1-y0) + (j - y0)*(x1-x0);
+            double l1 = -(i - x1)*(y2-y1) + (j - y1)*(x2-x1);
+            double l2 = -(i - x2)*(y0-y2) + (j - y2)*(x0-x2);
+            if (l0 >= 0 && l1 >= 0 && l2 >= 0) {
+              scale += 1;
+            }
+            iters += 1;
+          }
+        }
+
+        scale = scale / iters;
+        if (scale > 0) {
+          fill_pixel(x, y, color * scale);
         }
       }
     }
@@ -120,9 +140,38 @@ namespace CGL {
     float x1, float y1, Color c1,
     float x2, float y2, Color c2)
   {
-    // TODO: Task 4: Rasterize the triangle, calculating barycentric coordinates and using them to interpolate vertex colors across the triangle
-    // Hint: You can reuse code from rasterize_triangle
 
+    vector<Vector2D> coords = makeCounterClockwise(x0, y0, x1, y1, x2, y2);
+    x0 = coords[0][0]; x1 = coords[1][0]; x2 = coords[2][0];
+    y0 = coords[0][1]; y1 = coords[1][1]; y2 = coords[2][1];
+
+    int xmin = ceil(min(min(x0, x1), x2));
+    int xmax = ceil(max(max(x0, x1), x2));
+    int ymin = ceil(min(min(y0, y1), y2));
+    int ymax = ceil(max(max(y0, y1), y2));
+
+    double L0 = -(x0-x1)*(y2-y1) + (y0-y1)*(x2-x1);
+    double L1 = -(x1-x2)*(y0-y2) + (y1-y2)*(x0-x2);
+
+    for (int x = xmin; x < xmax; x++) {
+      for (int y = ymin; y < ymax; y++) {
+        
+        double i = x + 0.5;
+        double j = y + 0.5;
+        double l0 = -(i - x0)*(y1-y0) + (j - y0)*(x1-x0);
+        double l1 = -(i - x1)*(y2-y1) + (j - y1)*(x2-x1);
+        double l2 = -(i - x2)*(y0-y2) + (j - y2)*(x0-x2);
+        if (l0 >= 0 && l1 >= 0 && l2 >= 0) {
+          double L12 = -(x-x1)*(y2-y1) + (y-y1)*(x2-x1);
+          double L20 = -(x-x2)*(y0-y2) + (y-y2)*(x0-x2);
+          double a = L12 / L0;
+          double b = L20 / L1;
+          double c = 1 - a - b;
+          Color color = (a*c0) + (b*c1) + (c*c2);
+          fill_pixel(x, y, color);
+        }
+      }
+    }
 
 
   }
