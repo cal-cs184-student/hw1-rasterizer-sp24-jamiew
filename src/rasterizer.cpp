@@ -210,7 +210,6 @@ namespace CGL {
         double j_min = y + (0.5*step);
         vector<float> color{0,0,0};
         int iters = 0;
-        Color finalColor;
 
         for (double i=i_min; i<i_min+1-(0.5*step); i=i+step) {
           for (double j=j_min; j<j_min+1-(0.5*step); j=j+step) {
@@ -224,14 +223,21 @@ namespace CGL {
               double b = L20 / L1;
               double c = 1 - a - b;
               Vector2D coord = Vector2D(a*u0 + b*u1 + c*u2, a*v0 + b*v1 + c*v2);
-              finalColor = tex.sample_nearest(coord);
+              Color newColor = {0, 0, 0};
+              if (psm == P_NEAREST) {
+                newColor = tex.sample_nearest(coord);
+              } else if (psm == P_LINEAR) {
+                newColor = tex.sample_bilinear(coord);
+              }
+              color = {color[0] + newColor.r, color[1] + newColor.g, color[2] + newColor.b};
+              iters += 1;
             }
           }
-          iters += 1;
         }
 
-        if (finalColor != Color(0,0,0)) {
-          fill_pixel(x, y, finalColor);
+        if (color != vector<float>{0,0,0}) {
+          Color final_color = Color(color[0]/iters, color[1]/iters, color[2]/iters);
+          fill_pixel(x, y, final_color);
         }
       }
     }

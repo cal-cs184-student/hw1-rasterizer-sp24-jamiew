@@ -37,15 +37,27 @@ namespace CGL {
     return Color(1, 0, 1);
   }
 
+  Color lerp(double x, Color v0, Color v1) {
+    return v0 + x*(v1 + (-1*v0));
+  }
+  
   Color Texture::sample_bilinear(Vector2D uv, int level) {
-    // TODO: Task 5: Fill this in.
     auto& mip = mipmap[level];
 
+    uv = Vector2D(uv[0]*mip.width, uv[1]*mip.height);
+    double s = abs(round(uv[0]) - uv[0]) + 0.5;
+    double t = abs(round(uv[1]) - uv[1]) + 0.5;
 
+    Color c00 = mip.get_texel(round(uv[0]) + 0.5, round(uv[1]) + 0.5);
+    Color c10 = mip.get_texel(round(uv[0]) - 0.5, round(uv[1]) + 0.5);
+    Color c11 = mip.get_texel(round(uv[0]) + 0.5, round(uv[1]) - 0.5);
+    Color c01 = mip.get_texel(round(uv[0]) - 0.5, round(uv[1]) - 0.5);
 
+    Color c0 = lerp(s, c00, c10);
+    Color c1 = lerp(s, c01, c11);
+    Color final_color = lerp(t, c0, c1);
 
-    // return magenta for invalid level
-    return Color(1, 0, 1);
+    return final_color;
   }
 
 
