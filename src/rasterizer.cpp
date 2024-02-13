@@ -1,4 +1,5 @@
 #include "rasterizer.h"
+#include "vector2D.h"
 
 using namespace std;
 
@@ -65,12 +66,37 @@ namespace CGL {
     }
   } 
 
+  vector<Vector2D> makeCounterClockwise(float x0, float y0,
+    float x1, float y1,
+    float x2, float y2) {
+
+      Vector2D v01 = Vector2D(x0 - x1, y0 - y1);
+      Vector2D v12 = Vector2D(x1 - x2, y1 - y2);
+      Vector2D v20 = Vector2D(x2 - x0, y2 - y0);
+      vector<Vector2D> edges;
+
+      if (cross(v01, v20) > cross(v01, v12)) {
+        edges = {Vector2D(x0, y0), 
+                 Vector2D(x2, y2), 
+                 Vector2D(x1, y1)};
+      } else {
+        edges = {Vector2D(x0, y0), 
+                 Vector2D(x1, y1), 
+                 Vector2D(x2, y2)};
+      }
+
+      return edges;
+    }
+
   // Rasterize a triangle.
   void RasterizerImp::rasterize_triangle(float x0, float y0,
     float x1, float y1,
     float x2, float y2,
     Color color) {
-    // TODO: Task 1: Implement basic triangle rasterization here, no supersampling   
+
+    vector<Vector2D> coords = makeCounterClockwise(x0, y0, x1, y1, x2, y2);
+    x0 = coords[0][0]; x1 = coords[1][0]; x2 = coords[2][0];
+    y0 = coords[0][1]; y1 = coords[1][1]; y2 = coords[2][1];
 
     int xmin = ceil(min(min(x0, x1), x2));
     int xmax = ceil(max(max(x0, x1), x2));
@@ -87,10 +113,6 @@ namespace CGL {
         }
       }
     }
-    // TODO: Task 2: Update to implement super-sampled rasterization
-
-
-
   }
 
 
