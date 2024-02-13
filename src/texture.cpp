@@ -1,5 +1,6 @@
 #include "texture.h"
 #include "CGL/color.h"
+#include "vector2D.h"
 
 #include <cmath>
 #include <algorithm>
@@ -30,9 +31,8 @@ namespace CGL {
     // TODO: Task 5: Fill this in.
     auto& mip = mipmap[level];
 
-
-
-
+    return(mip.get_texel(round(uv[0]*mip.width), round(uv[1]*mip.height)));
+    
     // return magenta for invalid level
     return Color(1, 0, 1);
   }

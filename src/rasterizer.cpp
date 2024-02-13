@@ -1,5 +1,6 @@
 #include "rasterizer.h"
 #include <cmath>
+#include "texture.h"
 #include "vector2D.h"
 
 using namespace std;
@@ -172,8 +173,6 @@ namespace CGL {
         }
       }
     }
-
-
   }
 
 
@@ -186,7 +185,56 @@ namespace CGL {
     // TODO: Task 6: Set the correct barycentric differentials in the SampleParams struct.
     // Hint: You can reuse code from rasterize_triangle/rasterize_interpolated_color_triangle
 
+    vector<Vector2D> coords = makeCounterClockwise(x0, y0, x1, y1, x2, y2);
+    x0 = coords[0][0]; x1 = coords[1][0]; x2 = coords[2][0];
+    y0 = coords[0][1]; y1 = coords[1][1]; y2 = coords[2][1];
 
+    vector<Vector2D> texmps = makeCounterClockwise(u0, v0, u1, v1, u2, v2);
+    u0 = texmps[0][0]; u1 = texmps[1][0]; u2 = texmps[2][0];
+    v0 = texmps[0][1]; v1 = texmps[1][1]; v2 = texmps[2][1];
+
+    int xmin = floor(min(min(x0, x1), x2));
+    int xmax = ceil(max(max(x0, x1), x2));
+    int ymin = floor(min(min(y0, y1), y2));
+    int ymax = ceil(max(max(y0, y1), y2));
+
+    int dim = ceil(sqrt(sample_rate));
+    double step = 1.0 / dim;
+    double L0 = -(x0-x1)*(y2-y1) + (y0-y1)*(x2-x1);
+    double L1 = -(x1-x2)*(y0-y2) + (y1-y2)*(x0-x2);
+
+    for (double x=xmin; x<xmax; x++) {
+      for (double y=ymin; y<ymax; y++) {
+        
+        double i_min = x + (0.5*step);
+        double j_min = y + (0.5*step);
+        vector<float> color{0,0,0};
+        int iters = 0;
+        Color finalColor;
+
+        for (double i=i_min; i<i_min+1-(0.5*step); i=i+step) {
+          for (double j=j_min; j<j_min+1-(0.5*step); j=j+step) {
+            double l0 = -(i - x0)*(y1-y0) + (j - y0)*(x1-x0);
+            double l1 = -(i - x1)*(y2-y1) + (j - y1)*(x2-x1);
+            double l2 = -(i - x2)*(y0-y2) + (j - y2)*(x0-x2);
+            if (l0 >= 0 && l1 >= 0 && l2 >= 0) {
+              double L12 = -(i-x1)*(y2-y1) + (j-y1)*(x2-x1);
+              double L20 = -(i-x2)*(y0-y2) + (j-y2)*(x0-x2);
+              double a = L12 / L0;
+              double b = L20 / L1;
+              double c = 1 - a - b;
+              Vector2D coord = Vector2D(a*u0 + b*u1 + c*u2, a*v0 + b*v1 + c*v2);
+              finalColor = tex.sample_nearest(coord);
+            }
+          }
+          iters += 1;
+        }
+
+        if (finalColor != Color(0,0,0)) {
+          fill_pixel(x, y, finalColor);
+        }
+      }
+    }
 
 
   }
