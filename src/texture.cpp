@@ -7,20 +7,61 @@
 
 namespace CGL {
 
-  Color Texture::sample(const SampleParams& sp) {
-    // TODO: Task 6: Fill this in.
+    Color lerp(double x, Color v0, Color v1) {
+      return v0 + x*(v1 + (-1*v0));
+    }
 
+  Color Texture::sample(const SampleParams& sp) {
+    Color color;
+    if (sp.lsm == L_ZERO) {
+      sp.psm == P_NEAREST ? 
+        color = sample_nearest(sp.p_uv, 0) : 
+        color = sample_bilinear(sp.p_uv, 0);
+
+    } else if (sp.lsm == L_NEAREST) {
+      float level = get_level(sp);
+      sp.psm == P_NEAREST ? 
+        color = sample_nearest(sp.p_uv, level) : 
+        color = sample_bilinear(sp.p_uv, level);
+
+    } else if (sp.lsm == L_LINEAR) {
+      float level = get_level(sp);
+      Color color1;
+      Color color2;
+
+      sp.psm == P_NEAREST ? 
+        color1 = sample_nearest(sp.p_uv, level) :
+        color1 = sample_bilinear(sp.p_uv, level);
+      sp.psm == P_NEAREST ? 
+        color2 = sample_nearest(sp.p_uv, level+1) : 
+        color2 = sample_bilinear(sp.p_uv, level+1);
+      
+      color = 0.5*(color1 + color2);
+    }
+    return color;
 
 // return magenta for invalid level
     return Color(1, 0, 1);
   }
 
   float Texture::get_level(const SampleParams& sp) {
-    // TODO: Task 6: Fill this in.
+    
+    Vector2D du_dx = (sp.p_dx_uv - sp.p_uv);
+    Vector2D du_dy = (sp.p_dy_uv - sp.p_uv);
+    du_dx = Vector2D(du_dx[0]*width, du_dx[1]*height);
+    du_dy = Vector2D(du_dy[0]*width, du_dy[1]*height);
 
-
-
-    return 0;
+    float x = du_dx.norm();
+    float y = du_dy.norm();
+    float L = sqrt(x*x + y*y);
+    float D = log2(L);
+    
+    if (D < 0) {
+      D = 0;
+    } else if (D > kMaxMipLevels) {
+      D = kMaxMipLevels;
+    }
+    return D;
   }
 
   Color MipLevel::get_texel(int tx, int ty) {
@@ -28,17 +69,9 @@ namespace CGL {
   }
 
   Color Texture::sample_nearest(Vector2D uv, int level) {
-    // TODO: Task 5: Fill this in.
     auto& mip = mipmap[level];
-
     return(mip.get_texel(round(uv[0]*mip.width), round(uv[1]*mip.height)));
-    
-    // return magenta for invalid level
-    return Color(1, 0, 1);
-  }
-
-  Color lerp(double x, Color v0, Color v1) {
-    return v0 + x*(v1 + (-1*v0));
+  
   }
   
   Color Texture::sample_bilinear(Vector2D uv, int level) {

@@ -2,6 +2,7 @@
 #include <cmath>
 #include "texture.h"
 #include "vector2D.h"
+#include "drawrend.h"
 
 using namespace std;
 
@@ -110,6 +111,9 @@ namespace CGL {
 
     for (double x=xmin; x<xmax; x++) {
       for (double y=ymin; y<ymax; y++) {
+
+        if (floor(x) < 0 || floor(x) >= width) continue;
+        if (floor(y) < 0 || floor(y) >= height) continue;
         
         double scale = 0;
         double i_min = x + (0.5*step);
@@ -156,6 +160,9 @@ namespace CGL {
 
     for (int x = xmin; x < xmax; x++) {
       for (int y = ymin; y < ymax; y++) {
+
+        if (floor(x) < 0 || floor(x) >= width) continue;
+        if (floor(y) < 0 || floor(y) >= height) continue;
         
         double i = x + 0.5;
         double j = y + 0.5;
@@ -175,15 +182,32 @@ namespace CGL {
     }
   }
 
+  Vector2D getBarycentricTexCoord(int x, int y, vector<Vector2D> xyCoords, vector<Vector2D> texCoords) {
+    float x0 = xyCoords[0][0]; float x1 = xyCoords[1][0]; float x2 = xyCoords[2][0];
+    float y0 = xyCoords[0][1]; float y1 = xyCoords[1][1]; float y2 = xyCoords[2][1];
+
+    float u0 = texCoords[0][0]; float u1 = texCoords[1][0]; float u2 = texCoords[2][0];
+    float v0 = texCoords[0][1]; float v1 = texCoords[1][1]; float v2 = texCoords[2][1];
+
+    double L0 = -(x0-x1)*(y2-y1) + (y0-y1)*(x2-x1);
+    double L1 = -(x1-x2)*(y0-y2) + (y1-y2)*(x0-x2);
+
+    double L12 = -(x-x1)*(y2-y1) + (y-y1)*(x2-x1);
+    double L20 = -(x-x2)*(y0-y2) + (y-y2)*(x0-x2);
+    double a = L12 / L0;
+    double b = L20 / L1;
+    double c = 1 - a - b;
+
+    Vector2D coord = Vector2D(a*u0 + b*u1 + c*u2, a*v0 + b*v1 + c*v2);
+    return coord;
+  }
+
 
   void RasterizerImp::rasterize_textured_triangle(float x0, float y0, float u0, float v0,
     float x1, float y1, float u1, float v1,
     float x2, float y2, float u2, float v2,
     Texture& tex)
   {
-    // TODO: Task 5: Fill in the SampleParams struct and pass it to the tex.sample function.
-    // TODO: Task 6: Set the correct barycentric differentials in the SampleParams struct.
-    // Hint: You can reuse code from rasterize_triangle/rasterize_interpolated_color_triangle
 
     vector<Vector2D> coords = makeCounterClockwise(x0, y0, x1, y1, x2, y2);
     x0 = coords[0][0]; x1 = coords[1][0]; x2 = coords[2][0];
@@ -205,6 +229,16 @@ namespace CGL {
 
     for (double x=xmin; x<xmax; x++) {
       for (double y=ymin; y<ymax; y++) {
+
+        if (floor(x) < 0 || floor(x) >= width) continue;
+        if (floor(y) < 0 || floor(y) >= height) continue;
+
+        SampleParams sp;
+        sp.p_uv = getBarycentricTexCoord(x, y, coords, texmps);
+        sp.p_dx_uv = getBarycentricTexCoord(x+1, y, coords, texmps);
+        sp.p_dy_uv = getBarycentricTexCoord(x, y+1, coords, texmps);
+        sp.psm = psm;
+        sp.lsm = lsm;
         
         double i_min = x + (0.5*step);
         double j_min = y + (0.5*step);
@@ -217,18 +251,9 @@ namespace CGL {
             double l1 = -(i - x1)*(y2-y1) + (j - y1)*(x2-x1);
             double l2 = -(i - x2)*(y0-y2) + (j - y2)*(x0-x2);
             if (l0 >= 0 && l1 >= 0 && l2 >= 0) {
-              double L12 = -(i-x1)*(y2-y1) + (j-y1)*(x2-x1);
-              double L20 = -(i-x2)*(y0-y2) + (j-y2)*(x0-x2);
-              double a = L12 / L0;
-              double b = L20 / L1;
-              double c = 1 - a - b;
-              Vector2D coord = Vector2D(a*u0 + b*u1 + c*u2, a*v0 + b*v1 + c*v2);
+              Vector2D coord = getBarycentricTexCoord(i, j, coords, texmps);
               Color newColor = {0, 0, 0};
-              if (psm == P_NEAREST) {
-                newColor = tex.sample_nearest(coord);
-              } else if (psm == P_LINEAR) {
-                newColor = tex.sample_bilinear(coord);
-              }
+              newColor = tex.sample(sp);
               color = {color[0] + newColor.r, color[1] + newColor.g, color[2] + newColor.b};
               iters += 1;
             }
