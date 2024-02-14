@@ -14,7 +14,7 @@
     margin: 0;
   }
   .main {
-    padding: 0 100px;
+    padding: 0 150px;
     text-align: left;
     font-weight: 300;
     font-family: 'Open Sans', sans-serif;
@@ -77,6 +77,7 @@
   .caption {
     font-style: italic;
     font-size: 14px;
+    margin: -7px 0 0 0;
   }
   footer {
     height: 20vh;
@@ -114,7 +115,12 @@
 
       <h4>1. Rasterizing single-color triangles</h4>
       <p class="entry">
-        First, the algorithm determines how much of x- and y-space the triangle
+        Before diving into the rasterization, the algorithm begins by ensuring that
+        the winding order of the vertices is counterclockwise. It compares the cross
+        products of the first point with each of the remaining vertices and sets
+        the coordinate corresponding to the lowest product as the second point.
+        <br/><br/>
+        Next, the algorithm determines how much of x- and y-space the triangle
         covers to ensure that it does not test any extraneous pixels. It then loops
         through every integer coordinate combination within this space and checks
         whether the triangle contains the position. To do this, it calculates the
@@ -122,20 +128,50 @@
         point has a zero or positive distance from every line, it is within the 
         triangle. In that case, the corresponding pixel is filled in with the
         specified color. Otherwise, the loop continues.
-        <br/>
-        This algorithm specifically checks every pixel within the bounding box,
-        meaning that it has a comparable efficiency and memory cost as other 
+        <br/><br/>
+        This algorithm specifically checks only pixels within the bounding box,
+        meaning that it has a comparable efficiency and memory cost to other 
         bounding box algorithms. 
         <br/>
-        <img src="./images/task1.png" alt="Screenshot of rendered triangles, with the
-        pixel inspector highlighting an aliased region." width="500px" class="image"/>
+        <img src="./images/sample_rate_1.png" alt="Screenshot of rendered triangles, with the
+        pixel inspector highlighting an aliased region." width="400px" class="image"/>
         <p class="caption">
           Fig 1. Rendered triangles with the pixel inspector highlighting an aliased region.
         </p>
       </p>
 
       <h4>2. Antialiasing triangles</h4>
-      <p></p>
+      <p>
+        Supersampling averages the color values of set positions within each pixel,
+        which creates pixels that better approximates the ground truth graphic. Allowing
+        intermediate color values smooths edges, softens jaggies, and reduces visual 
+        artifacts, making supersampling an essential anti-aliasing technique.
+        <br><br>
+        To achieve this, I added some extra steps to the basic rasterization process.
+        Instead of immediately checking for triangle membership and filling in the pixel at
+        each (x,y) position, the algorithm first loops throuh intermediate positions within
+        the pixel using another double for loop that increments each position by the inverse
+        of the sampling rate (the "step size" between samples). The scale variable tallies
+        the number of these intermediate positions are within the triangle, while the inters 
+        variable tracks the total positions checked. After checking each sample, the algorithm
+        determines the final scale factor by dividing the triangle membership sum by the
+        iteration sum. It fills in the pixel at (x, y) with the initial color multiplied by
+        the scale factor.
+        <br/><br/>
+        Thus, this method uses the linearity properties of the RGB color scale to keep
+        the data structures simple and avoid overusing memory.
+        <div style="display: flex;">
+          <img src="./images/sample_rate_1.png" alt="Screenshot of rendered triangles with a sampling rate of 1." 
+            width="300px" class="image"/>
+          <img src="./images/sample_rate_4.png" alt="Screenshot of rendered triangles with a sampling rate of 4." 
+            width="300px" class="image"/>
+          <img src="./images/sample_rate_16.png" alt="Screenshot of rendered triangles with a sampling rate of 16." 
+            width="300px" class="image"/>
+        </div>
+        <p class="caption">
+          Fig 2. Rendered triangles with sampling rates of 1, 4, and 16 respectively (left to right).
+        </p>
+      </p>
 
       <h4>3. Transforms</h4>
       <p></p>
