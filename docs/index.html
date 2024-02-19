@@ -133,7 +133,7 @@
         meaning that it has a comparable efficiency and memory cost to other 
         bounding box algorithms. 
         <br/>
-        <img src="./images/sample_rate_1.png" alt="Screenshot of rendered triangles, with the
+        <img src="./images/sample_rate_1.png" alt="Rendered triangles, with the
         pixel inspector highlighting an aliased region." width="400px" class="image"/>
         <p class="caption">
           Fig 1. Rendered triangles with the pixel inspector highlighting an aliased region.
@@ -141,7 +141,7 @@
       </p>
 
       <h4>2. Antialiasing triangles</h4>
-      <p>
+      <p class="entry">
         Supersampling averages the color values of set positions within each pixel,
         which creates pixels that better approximates the ground truth graphic. Allowing
         intermediate color values smooths edges, softens jaggies, and reduces visual 
@@ -161,11 +161,11 @@
         Thus, this method uses the linearity properties of the RGB color scale to keep
         the data structures simple and avoid overusing memory.
         <div style="display: flex;">
-          <img src="./images/sample_rate_1.png" alt="Screenshot of rendered triangles with a sampling rate of 1." 
+          <img src="./images/sample_rate_1.png" alt="Rendered triangles with a sampling rate of 1." 
             width="300px" class="image"/>
-          <img src="./images/sample_rate_4.png" alt="Screenshot of rendered triangles with a sampling rate of 4." 
+          <img src="./images/sample_rate_4.png" alt="Rendered triangles with a sampling rate of 4." 
             width="300px" class="image"/>
-          <img src="./images/sample_rate_16.png" alt="Screenshot of rendered triangles with a sampling rate of 16." 
+          <img src="./images/sample_rate_16.png" alt="Rendered triangles with a sampling rate of 16." 
             width="300px" class="image"/>
         </div>
         <p class="caption">
@@ -174,7 +174,16 @@
       </p>
 
       <h4>3. Transforms</h4>
-      <p></p>
+      <p class="entry">
+        With a few rotations, transformations, and scaling changes, cubeman can do a cartwheel. This rendering
+        includes some basic shadow to make the position clearer for the viewer.
+        <br/>
+        <img src="./images/cartwheel.png" alt="Cubeman doing a cartwheel." 
+            width="300px" class="image"/>
+        <p class="caption">
+          Fig 3. Cubeman doing a cartwheel.
+        </p>
+      </p>
     </div>
 
     <div>
@@ -182,7 +191,24 @@
       <h3 class="section">Sampling</h3>
 
       <h4>4. Barycentric coordinates</h4>
-      <p></p>
+      <p class="entry">
+        Barycentric coordinates are a format for expressing the color (or other associated value)
+        at a particular location inside a polygon with respect to its vertices. The point is a 
+        weighted combination of the value at each vertex-- each vertex contributed some fraction
+        of their own value to the point depending on their distance. The result is a polygon with 
+        an interpolated fill that transitions between the different defined values at each vertex.
+        <div style="display: flex;">
+          <img src="./images/barycentric.png" alt="A triangle made with barycentric coordinates,
+                    highlighting a purple pixel inside it that results from interpolating between a red and
+                    blue vertex." 
+            width="500px" class="image"/>
+          <img src="./images/spectrum.png" alt="A rendering of an HSB color wheel." 
+            width="250px" height="250px" class="image"/>
+        </div>
+        <p class="caption">
+          Fig 4. Examples of rendering with barycentric coordinates.
+        </p>
+      </p>
 
       <h4>5. "Pixel sampling" for texture mapping</h4>
       <p></p>

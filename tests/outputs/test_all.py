@@ -6,15 +6,16 @@ import os
 import subprocess
 import filecmp
 
-draw_binary = os.path.join('..', '..', 'build', 'draw')
+root = os.getcwd()
+draw_binary = os.path.join(root, 'build', 'draw')
 
 # Visual studio
 if not os.path.isfile(draw_binary):
-    draw_binary = os.path.join('..', '..', 'build', 'Debug', 'draw')
+    draw_binary = os.path.join(root, 'build', 'Debug', 'draw')
 
-scan_dirs = [os.path.join('..', '..', 'svg')] # Add more directories here with .svg files
-output_dir = 'outputs/'
-reference_dir = 'reference/'
+scan_dirs = [os.path.join(root, 'svg')] # Add more directories here with .svg files
+output_dir = os.path.join(root, 'tests', 'outputs')
+reference_dir = os.path.join(root, 'tests', 'outputs', 'reference')
 
 print(draw_binary)
 
